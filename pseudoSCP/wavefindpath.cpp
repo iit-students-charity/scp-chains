@@ -16,17 +16,15 @@ using namespace std;
 
 sc_memory_context *context;
 
-sc_addr graph, rrel_arcs, rrel_nodes, arcs;
-
 vector<vector<sc_addr> > chains;
 
 vector<sc_addr> vertices;
 
-vector<sc_addr> getAllVertices();
+vector<sc_addr> getAllVertices(sc_addr);
 
 void getChainByLength(char, int);
 
-void DFSchain(sc_addr , sc_addr , int *, vector<sc_addr>);
+void DFSchain(sc_addr, sc_addr, int*, vector<sc_addr>, sc_addr);
 
 int getIndex(sc_addr);
 
@@ -75,7 +73,8 @@ int main()
     return 0;
 }
 
-vector<sc_addr> getAllVertices(){
+vector<sc_addr> getAllVertices(sc_addr graph) 
+{
     vector<sc_addr> vertices;
 
     sc_iterator5 *sc_vertices = sc_iterator5_f_a_a_a_f_new(context,
@@ -91,23 +90,31 @@ vector<sc_addr> getAllVertices(){
                                   set_vertexes,
                                   sc_type_arc_pos_const_perm,
                                   0);
+
         while (SC_TRUE == sc_iterator3_next(it_vertex)) {
             sc_addr curr_vertex = sc_iterator3_value(it_vertex, 2);
             vertices.push_back(curr_vertex);
         }
+
         sc_iterator3_free(it_vertex);
     }
+
     sc_iterator5_free(sc_vertices);
     return vertices;
 }
 
-void getChainByLength(char name_graph, int length) {
+void getChainByLength(char graph_name, int length)
+{
 
     char gr[3] = "Gx";
-    gr[1] = name_graph;
+    gr[1] = graph_name;
+
+    sc_addr graph, rrel_arcs, rrel_nodes;
+
     sc_helper_resolve_system_identifier(context, gr, &graph);
     sc_helper_resolve_system_identifier(context, "rrel_arcs", &rrel_arcs);
     sc_helper_resolve_system_identifier(context, "rrel_nodes", &rrel_nodes);
+
     sc_iterator5 *it_arcs = sc_iterator5_f_a_a_a_f_new(context,
                              graph,
                              sc_type_arc_pos_const_perm,
@@ -115,12 +122,13 @@ void getChainByLength(char name_graph, int length) {
                              sc_type_arc_pos_const_perm,
                              rrel_arcs);
 
+    sc_addr arcs;
     if (SC_TRUE == sc_iterator5_next(it_arcs)) {
         arcs = sc_iterator5_value(it_arcs, 2);
     }
     sc_iterator5_free(it_arcs);
 
-    vertices = getAllVertices();
+    vertices = getAllVertices(graph);
     int V = vertices.size();
     int *color = new int[V];
 
@@ -132,7 +140,7 @@ void getChainByLength(char name_graph, int length) {
             }
             vector<sc_addr> simpleChain;
             simpleChain.push_back(vertices[i]);
-            DFSchain(vertices[i],vertices[j],color, simpleChain);
+            DFSchain(vertices[i],vertices[j],color, simpleChain, arcs);
         }
     }
 
@@ -144,7 +152,7 @@ void getChainByLength(char name_graph, int length) {
             }
             vector<sc_addr> simpleChain;
             simpleChain.push_back(vertices[i]);
-            DFSchain(vertices[i],vertices[j],color, simpleChain);
+            DFSchain(vertices[i],vertices[j],color, simpleChain, arcs);
         }
     }
 
@@ -163,6 +171,7 @@ void getChainByLength(char name_graph, int length) {
         cout<<"There are no chains"<<endl;
         return;
     }
+
     for(int i = 0; i < result.size(); i++){
         for(int j = 0; j < result[i].size()-1; j++){
             printEl(context, result[i][j]);
@@ -174,62 +183,78 @@ void getChainByLength(char name_graph, int length) {
 
 }
 
-void DFSchain(sc_addr u, sc_addr endV, int *color, vector<sc_addr> simpleChain) {
-    if (!SC_ADDR_IS_EQUAL(u, endV)) {
-        color[getIndex(u)] = 2;
+void DFSchain(sc_addr begin, sc_addr end, int *color, vector<sc_addr> simpleChain, sc_addr arcs)
+{
+    if (!SC_ADDR_IS_EQUAL(begin, end)) {
+        color[getIndex(begin)] = 2;
     }
-    if(SC_ADDR_IS_EQUAL(u, endV)) {
+
+    if(SC_ADDR_IS_EQUAL(begin, end)) {
         chains.push_back(simpleChain);
         return;
     }
 
     sc_iterator5 *it_vertex = sc_iterator5_f_a_a_a_f_new(context,
-                              u,
+                              begin,
                               sc_type_arc_common,
                               0,
                               sc_type_arc_pos_const_perm,
                               arcs);
+
     if(it_vertex != NULL){
+
         while (SC_TRUE == sc_iterator5_next(it_vertex)) {
             sc_addr anotherVertex = sc_iterator5_value(it_vertex, 2);
+
             if (color[getIndex(anotherVertex)] == 1) {
                 vector<sc_addr> alternative = simpleChain;
                 alternative.push_back(anotherVertex);
-                DFSchain(anotherVertex, endV, color, alternative);
+                DFSchain(anotherVertex, end, color, alternative);
                 color[getIndex(anotherVertex)] = 1;
             }
+
         }
+
     }
 
 }
 
-int getIndex(sc_addr vertex){
+int getIndex(sc_addr vertex)
+{
     int V = vertices.size();
+
     for(int i = 0; i < V; i++){
         if(SC_ADDR_IS_EQUAL(vertex, vertices[i])){
             return i;
         }
     }
+
     return -1;
 }
 
-int getWeight(sc_addr v1, sc_addr v2){
+int getWeight(sc_addr v1, sc_addr v2)
+{
+
     sc_iterator5 *it = sc_iterator5_f_a_f_a_a_new(context,
                              v1,
                              sc_type_arc_common,
                              v2,
                              sc_type_arc_common,
                              0);
+
     int weight = 0;
+
     if (SC_TRUE == sc_iterator5_next(it)) {
         sc_addr node_weight = sc_iterator5_value(it, 4);
         weight = toInt(node_weight);
     }
+
     sc_iterator5_free(it);
     return weight;
 }
 
-int toInt(sc_addr element){
+int toInt(sc_addr element)
+{
     int number = 0;
     sc_addr idtf;
     sc_type type;
