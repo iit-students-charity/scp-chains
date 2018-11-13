@@ -9,12 +9,12 @@ scp_program -> proc_out (*
 		//Если множество непустое, то находим первую цепь
 		//Если множество пустое, то выводим информацию о том, что цепей нет
 		-> rrel_init: ..proc_out_create_all_chains (*
-			 <- searchSetStr5;;
-			-> rrel_1: rrel_fixed: rrel_scp_var: _graph;;
-			-> rrel_2: rrel_assign: rrel_common: rrel_scp_var: _arc1;;
+			<- searchSetStr5;;
+			-> rrel_1: rrel_fixed: rrel_pos_const_perm: rrel_scp_var: _graph;;
+			-> rrel_2: rrel_assign: rrel_scp_var: _arc1;;
 			-> rrel_3: rrel_assign: rrel_scp_var: _vertex_1;;
-			-> rrel_4: rrel_assign: rrel_pos_const_perm: rrel_scp_var: _arc2;;
-			-> rrel_5: rrel_fixed: rrel_scp_const: rrel_chain;;
+			-> rrel_4: rrel_assign: rrel_scp_var: _arc2;;
+			-> rrel_5: rrel_fixed: rrel_pos_const_perm: rrel_scp_const: rrel_chain;;
 			->rrel_set_3: rrel_assign: rrel_scp_var: _all_chains;;
 			=> nrel_then: ..proc_out_get_chain;;		
 			=> nrel_else: ..proc_out_print_not_exists;;	
@@ -23,7 +23,7 @@ scp_program -> proc_out (*
 		//Оператор вывода ("There are no chains")
 		//Затем выход из программы
 		-> ..proc_out_print_not_exists (*
-			<- print;;
+			<- printNl;;
 			-> rrel_1: rrel_fixed: rrel_scp_const: [There are no chains];; 		
 			=> nrel_goto: ..proc_out_return;;	
 		*);;
@@ -34,15 +34,15 @@ scp_program -> proc_out (*
 		-> ..proc_out_get_chain (*
 			<- searchElStr3;;
 			-> rrel_1: rrel_fixed: rrel_scp_var: _all_chains;;
-			-> rrel_2: rrel_assign: rrel_scp_var: _deleted_arc;;
+			-> rrel_2: rrel_assign: rrel_scp_var: rrel_pos_const_perm: _deleted_arc;;
 			-> rrel_3: rrel_assign: rrel_scp_var: _chain;;
-			=> nrel_then: ..proc_out_delete_arc;
+			=> nrel_then: ..proc_out_delete_arc;;
 			=> nrel_else: ..proc_out_clear;;
 		*);;
 
 		//Удаление дуги между цепью и множеством всех цепей
 		//Переход к получению первой вершины в цепи _chain
-		-> ..proc_out_clear (*
+		-> ..proc_out_delete_arc (*
 			<- eraseEl;;
 			-> rrel_1: rrel_fixed: rrel_erase: rrel_scp_var: _deleted_arc;;
 			=> nrel_goto: ..proc_out_get_first_vertex;;	
@@ -59,7 +59,7 @@ scp_program -> proc_out (*
 			-> rrel_4: rrel_assign: rrel_scp_var: _arc2;;
 			-> rrel_5: rrel_fixed: rrel_scp_const: rrel_next;;
 			=> nrel_then: ..proc_out_print_vertex;;
-			=> nrel_else: ..proc_out_clear;;
+			=> nrel_else: ..proc_out_get_chain;;
 		*);;
 
 		//Удаление множества всех вершин
@@ -70,11 +70,24 @@ scp_program -> proc_out (*
 			=> nrel_goto: ..proc_out_return;;	
 		*);;
 
+		//Поиск идентификатора печатываемой вершины
+		//Переход к самому оператору печати
+		-> ..proc_out_print_vertex (*
+			 <- searchElStr5;;
+			-> rrel_1: rrel_fixed: rrel_scp_var: _begin_vertex;;
+			-> rrel_2: rrel_assign: rrel_const: rrel_common: rrel_scp_var: _arc2;;
+			-> rrel_3: rrel_assign: rrel_scp_var: _print_value;;
+			-> rrel_4: rrel_assign: rrel_pos: rrel_scp_var: _arc4;;
+			-> rrel_5: rrel_fixed: rrel_scp_const: nrel_system_identifier;;
+			=> nrel_then: ..proc_out_print_vertex_value;;		
+		 	=> nrel_else: ..proc_out_clear;;
+		*);;
+
 		//Оператор вывода первой вершины
 		//Переход к нахождению следующей вершины
-		->..proc_out_print_vertex (*
+		->..proc_out_print_vertex_value (*
 			<-print;;
-			-> rrel_1: rrel_fixed: rrel_scp_var: _begin_vertex;;
+			-> rrel_1: rrel_fixed: rrel_scp_var: _print_value;;
 			=>nrel_goto: ..proc_out_get_next_vertex;;
 		*);;
 
@@ -100,11 +113,24 @@ scp_program -> proc_out (*
 			=> nrel_goto: ..proc_out_print_next_vertex;;	
 		*);;
 
+		//Поиск идентификатора печатываемой вершины
+		//Переход к самому оператору печати
+		-> ..proc_out_print_next_vertex (*
+			 <- searchElStr5;;
+			-> rrel_1: rrel_fixed: rrel_scp_var: _next_vertex;;
+			-> rrel_2: rrel_assign: rrel_const: rrel_common: rrel_scp_var: _arc2;;
+			-> rrel_3: rrel_assign: rrel_scp_var: _print_value;;
+			-> rrel_4: rrel_assign: rrel_pos: rrel_scp_var: _arc4;;
+			-> rrel_5: rrel_fixed: rrel_scp_const: nrel_system_identifier;;
+			=> nrel_then: ..proc_out_print_next_vertex_value;;		
+		 	=> nrel_else: ..proc_out_clear;;
+		*);;
+
 		//Оператор вывода первой вершины
 		//Переход к присваиванию следующей вершины текущей (_begin_vertex = _next_vertex)
-		->..proc_out_print_next_vertex (*
+		->..proc_out_print_next_vertex_value (*
 			<-print;;
-			-> rrel_1: rrel_fixed: rrel_scp_var: _next_vertex;;
+			-> rrel_1: rrel_fixed: rrel_scp_var: _print_value;;
 			=>nrel_goto: ..proc_out_change_value_of_begin_vertex;;
 		*);;
 
@@ -114,7 +140,14 @@ scp_program -> proc_out (*
 			<-varAssign;;
 			-> rrel_1: rrel_assign: rrel_scp_var: _begin_vertex;;
 			-> rrel_2: rrel_fixed: rrel_scp_var: _next_vertex;;
-			=>nrel_goto: ..proc_out_get_next_vertex;;
+			=>nrel_goto: ..proc_out_print_new_line;;
+		*);;
+
+		//Переход на новую строку
+		-> ..proc_out_print_new_line (*
+			<- printNl;;
+			-> rrel_1: rrel_fixed: rrel_scp_const: [];; 		
+			=> nrel_goto: ..proc_out_get_next_vertex;;	
 		*);;
 
 		//Оператор return
