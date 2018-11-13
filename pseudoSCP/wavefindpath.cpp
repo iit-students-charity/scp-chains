@@ -54,7 +54,7 @@ int main()
     getChainByLength('1', 5);
     cout<<"----------------"<<endl;
 
-    cout<<"G2:"<<endl<<"length of chain = 6"<<endl;
+    cout<<"G2:"<<endl<<"length of chain = 3"<<endl;
     getChainByLength('2', 3);
     cout<<"----------------"<<endl;
 
