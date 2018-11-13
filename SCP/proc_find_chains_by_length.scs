@@ -170,15 +170,15 @@ scp_program -> proc_find_chains_by_length (*
 			-> rrel_3: rrel_fixed: rrel_scp_var: _another_vertex;;
 			-> rrel_4: rrel_assign: rrel_scp_var: _simple_chain;;
 		*);;
-		-> rrel_3: rrel_assign: rrel_scp_var: _descr;;
-		=> nrel_goto: ..proc_find_all_chains_by_length_wait;;
+		-> rrel_3: rrel_assign: rrel_scp_var: _descr1;;
+		=> nrel_goto: ..proc_find_all_chains_by_length_wait_after_find_all_chains;;
 	*);;
 
 	//Оператор ожидания завершения программы proc_find_all_chains
 	//После этого добавим начальную вершину во множество всех вершин
-	-> ..proc_find_all_chains_by_length_wait (*
+	-> ..proc_find_all_chains_by_length_wait_after_find_all_chains (*
 		<- waitReturn;;
-		-> rrel_1: rrel_fixed: rrel_scp_var: _descr;;
+		-> rrel_1: rrel_fixed: rrel_scp_var: _descr1;;
 		=> nrel_goto: ..proc_find_all_chains_by_length_recovery_begin_vertex;;
 	*);;
 
@@ -189,6 +189,75 @@ scp_program -> proc_find_chains_by_length (*
 		-> rrel_2: rrel_assign: rrel_pos_const_perm: rrel_scp_var: _new_arc;;
 		-> rrel_3: rrel_fixed: rrel_scp_var: _begin_vertex;;
 		=> nrel_goto: ..proc_find_all_chains_by_length_get_begin_vertex;;
+	*);;
+
+	//Оператор удаления множества всех вершин
+	-> ..proc_find_all_chains_by_length_clear (*
+		<- eraseEl;;
+		-> rrel_1: rrel_fixed: rrel_erase: rrel_scp_var: _all_vertices;;
+		=> nrel_goto: ..proc_find_all_chains_by_length_clear_begin_vertices;;	
+	*);;
+
+	//Оператор удаления множества начальный вершин
+	-> ..proc_find_all_chains_by_length_clear_begin_vertices (*
+		<- eraseEl;;
+		-> rrel_1: rrel_fixed: rrel_erase: rrel_scp_var: _all_begin_vertices;;
+		=> nrel_goto: ..proc_find_all_chains_by_length_call_SIFT_EXCESS_CHAINS;;	
+	*);;
+
+	//Оператор вызова proc_sift_excess_chains
+	//Вызванная программа отсеивает лишние цепи (у которых длина != _length)
+	-> ..proc_find_all_chains_by_length_call_FIND_ALL_CHAINS (*
+		<- call;;
+		-> rrel_1: rrel_fixed: rrel_scp_const: proc_sift_excess_chains;;
+		-> rrel_2: rrel_fixed: rrel_scp_const: ... (*
+			-> rrel_1: rrel_fixed: rrel_scp_var: _graph;;
+			-> rrel_2: rrel_fixed: rrel_scp_var: _length;;
+		*);;
+		-> rrel_3: rrel_assign: rrel_scp_var: _descr2;;
+		=> nrel_goto: ..proc_find_all_chains_by_length_wait_after_sift_excess_chains;;
+	*);;
+
+	//Оператор ожидания завершения программы proc_sift_excess_chains
+	//После этого переходим к оператору вызова программы proc_out
+	-> ..proc_find_all_chains_by_length_wait_after_sift_excess_chains (*
+		<- waitReturn;;
+		-> rrel_1: rrel_fixed: rrel_scp_var: _descr2;;
+		=> nrel_goto: ..proc_find_all_chains_by_length_call_out;;
+	*);;
+
+	//Оператор вызова proc_out
+	//Вызванная программа выводит результат
+	-> ..proc_find_all_chains_by_length_call_out (*
+		<- call;;
+		-> rrel_1: rrel_fixed: rrel_scp_const: proc_out;;
+		-> rrel_2: rrel_fixed: rrel_scp_const: ... (*
+			-> rrel_1: rrel_fixed: rrel_scp_var: _graph;;
+			-> rrel_2: rrel_fixed: rrel_scp_var: _length;;
+		*);;
+		-> rrel_3: rrel_assign: rrel_scp_var: _descr3;;
+		=> nrel_goto: ..proc_find_all_chains_by_length_wait_after_out;;
+	*);;
+
+	//Оператор ожидания завершения программы proc_find_out
+	//После этого переходим к оператору вызова программы очистки памяти
+	-> ..proc_find_all_chains_by_length_wait_after_out (*
+		<- waitReturn;;
+		-> rrel_1: rrel_fixed: rrel_scp_var: _descr3;;
+		=> nrel_goto: ..proc_find_all_chains_by_length_clear_graph;;
+	*);;
+
+	//Оператор вызова proc_clear_graph
+	//Вызванная программа очищает память
+	-> ..proc_find_all_chains_by_length_call_out (*
+		<- call;;
+		-> rrel_1: rrel_fixed: rrel_scp_const: proc_clear_graph;;
+		-> rrel_2: rrel_fixed: rrel_scp_const: ... (*
+			-> rrel_1: rrel_fixed: rrel_scp_var: _graph;;
+			-> rrel_2: rrel_fixed: rrel_scp_var: _length;;
+		*);;
+		-> rrel_3: rrel_assign: rrel_scp_var: _descr3;;
+		=> nrel_goto: ..proc_find_all_chains_by_length_wait_after_out;;
 	*);;
 
 	//Оператор return
