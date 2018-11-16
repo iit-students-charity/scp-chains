@@ -167,6 +167,12 @@ scp_program -> proc_find_chains_by_length (*
 	-> ..proc_find_all_chains_by_length_create_simple_chain (*
 		<- genEl;;
 		-> rrel_1: rrel_assign: rrel_node: rrel_scp_var: _simple_chain;;
+		=> nrel_goto: ..proc_find_all_chains_by_length_create_rrel_next;;
+	*);;
+
+	-> ..proc_find_all_chains_by_length_create_rrel_next (*
+		<- genEl;;
+		-> rrel_1: rrel_fixed: rrel_scp_const: rrel_next;;
 		=> nrel_goto: ..proc_find_all_chains_by_length_add_first_vertex;;
 	*);;
 

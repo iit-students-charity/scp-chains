@@ -73,7 +73,7 @@ int main()
     return 0;
 }
 
-vector<sc_addr> getAllVertices(sc_addr graph) 
+vector<sc_addr> getAllVertices(sc_addr graph, sc_addr rrel_nodes) 
 {
     vector<sc_addr> vertices;
 
@@ -128,7 +128,7 @@ void getChainByLength(char graph_name, int length)
     }
     sc_iterator5_free(it_arcs);
 
-    vertices = getAllVertices(graph);
+    vertices = getAllVertices(graph, rrel_nodes);
     int V = vertices.size();
     int *color = new int[V];
 
@@ -209,7 +209,7 @@ void DFSchain(sc_addr begin, sc_addr end, int *color, vector<sc_addr> simpleChai
             if (color[getIndex(anotherVertex)] == 1) {
                 vector<sc_addr> alternative = simpleChain;
                 alternative.push_back(anotherVertex);
-                DFSchain(anotherVertex, end, color, alternative);
+                DFSchain(anotherVertex, end, color, alternative, arcs);
                 color[getIndex(anotherVertex)] = 1;
             }
 
