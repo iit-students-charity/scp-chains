@@ -1,14 +1,14 @@
 directed_graph->graph1(*
-	->rrel_vertex: V1;;
-	->rrel_vertex: V2;;
-	->rrel_vertex: V3;;
-	->rrel_vertex: V4;;
-	->rrel_edge: (V2 => V1);;
-	->rrel_edge: (V1 => V3);;
-	->rrel_edge: (V2 => V3);;
-	->rrel_edge: (V3 => V4);;
+	->rrel_node: V1_1s;;
+	->rrel_node: V2_1s;;
+	->rrel_node: V3_1s;;
+	->rrel_node: V4_1s;;
+	->rrel_edge: (V2_1s => V1_1s);;
+	->rrel_edge: (V1_1s => V3_1s);;
+	->rrel_edge: (V2_1s => V3_1s);;
+	->rrel_edge: (V3_1s => V4_1s);;
 *);;
-[2]=>(V2 => V1);;
-[1]=>(V1 => V3);;
-[3]=>(V2 => V3);;
-[4]=>(V3 => V4);;
+[2]=>(V2_1s => V1_1s);;
+[1]=>(V1_1s => V3_1s);;
+[3]=>(V2_1s => V3_1s);;
+[4]=>(V3_1s => V4_1s);;

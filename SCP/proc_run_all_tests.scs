@@ -7,7 +7,7 @@ scp_program -> proc_run_all_tests (*
 	//Вызов первого теста
 	-> rrel_init: ..proc_run_test_1 (*
 		<- call;;
-		-> rrel_1: rrel_fixed: rrel_scp_const: proc_run_test;;
+		-> rrel_1: rrel_fixed: rrel_scp_const: proc_find_chains_by_length;;
 		-> rrel_2: rrel_fixed: rrel_scp_const: ... (*
 			//Имя графа
 			-> rrel_1: rrel_fixed: rrel_scp_const: graph1;;
@@ -30,7 +30,7 @@ scp_program -> proc_run_all_tests (*
 		
 	/*-> ..proc_run_test_2 (*
 		<- call;;
-		-> rrel_1: rrel_fixed: rrel_scp_const: proc_run_testcase;;
+		-> rrel_1: rrel_fixed: rrel_scp_const: proc_find_chains_by_length;;
 		-> rrel_2: rrel_fixed: rrel_scp_const: ... (*
 			-> rrel_1: rrel_fixed: rrel_scp_const: graph2;;
 			-> rrel_2: rrel_fixed: rrel_scp_const: [5];;
@@ -48,7 +48,7 @@ scp_program -> proc_run_all_tests (*
 	
 	-> ..proc_run_test_3 (*
 		<- call;;
-		-> rrel_1: rrel_fixed: rrel_scp_const: proc_run_testcase;;
+		-> rrel_1: rrel_fixed: rrel_scp_const: proc_find_chains_by_length;;
 		-> rrel_2: rrel_fixed: rrel_scp_const: ... (*
 			-> rrel_1: rrel_fixed: rrel_scp_const: graph3;;
 			-> rrel_2: rrel_fixed: rrel_scp_const: [3];;
@@ -66,7 +66,7 @@ scp_program -> proc_run_all_tests (*
 
 	-> ..proc_run_test_4 (*
 		<- call;;
-		-> rrel_1: rrel_fixed: rrel_scp_const: proc_run_testcase;;
+		-> rrel_1: rrel_fixed: rrel_scp_const: proc_find_chains_by_length;;
 		-> rrel_2: rrel_fixed: rrel_scp_const: ... (*
 			-> rrel_1: rrel_fixed: rrel_scp_const: graph4;;
 			-> rrel_2: rrel_fixed: rrel_scp_const: [7];;
@@ -84,7 +84,7 @@ scp_program -> proc_run_all_tests (*
 		
 	-> ..proc_run_test_5 (*
 		<- call;;
-		-> rrel_1: rrel_fixed: rrel_scp_const: proc_run_testcase;;
+		-> rrel_1: rrel_fixed: rrel_scp_const: proc_find_chains_by_length;;
 		-> rrel_2: rrel_fixed: rrel_scp_const: ... (*
 			-> rrel_1: rrel_fixed: rrel_scp_const: graph5;;
 			-> rrel_2: rrel_fixed: rrel_scp_const: [3];;

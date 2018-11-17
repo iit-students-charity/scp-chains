@@ -50,12 +50,12 @@ int main()
     getChainByLength('0', 3);
     cout<<"----------------"<<endl;
 
-    /*cout<<"G1:"<<endl<<"length of chain = 5"<<endl;
+    cout<<"G1:"<<endl<<"length of chain = 5"<<endl;
     getChainByLength('1', 5);
     cout<<"----------------"<<endl;
 
-    cout<<"G2:"<<endl<<"length of chain = 3"<<endl;
-    getChainByLength('2', 3);
+    cout<<"G2:"<<endl<<"length of chain = 6"<<endl;
+    getChainByLength('2', 6);
     cout<<"----------------"<<endl;
 
     cout<<"G3:"<<endl<<"length of chain = 7"<<endl;
@@ -64,7 +64,7 @@ int main()
 
     cout<<"G4:"<<endl<<"length of chain = 3"<<endl;
     getChainByLength('4', 3);
-    cout<<"----------------"<<endl;*/
+    cout<<"----------------"<<endl;
 
     sc_memory_context_free(context);
 
@@ -73,8 +73,12 @@ int main()
     return 0;
 }
 
-vector<sc_addr> getAllVertices(sc_addr graph, sc_addr rrel_nodes) 
+vector<sc_addr> getAllVertices(sc_addr graph)
 {
+
+    sc_addr rrel_nodes;
+    sc_helper_resolve_system_identifier(context, "rrel_nodes", &rrel_nodes);
+
     vector<sc_addr> vertices;
 
     sc_iterator5 *sc_vertices = sc_iterator5_f_a_a_a_f_new(context,
@@ -109,11 +113,11 @@ void getChainByLength(char graph_name, int length)
     char gr[3] = "Gx";
     gr[1] = graph_name;
 
-    sc_addr graph, rrel_arcs, rrel_nodes;
+    sc_addr graph, rrel_arcs;
 
     sc_helper_resolve_system_identifier(context, gr, &graph);
     sc_helper_resolve_system_identifier(context, "rrel_arcs", &rrel_arcs);
-    sc_helper_resolve_system_identifier(context, "rrel_nodes", &rrel_nodes);
+
 
     sc_iterator5 *it_arcs = sc_iterator5_f_a_a_a_f_new(context,
                              graph,
@@ -128,7 +132,7 @@ void getChainByLength(char graph_name, int length)
     }
     sc_iterator5_free(it_arcs);
 
-    vertices = getAllVertices(graph, rrel_nodes);
+    vertices = getAllVertices(graph);
     int V = vertices.size();
     int *color = new int[V];
 
@@ -181,6 +185,8 @@ void getChainByLength(char graph_name, int length)
         cout<<endl;
     }
 
+    chains.clear();
+    vertices.clear();
 }
 
 void DFSchain(sc_addr begin, sc_addr end, int *color, vector<sc_addr> simpleChain, sc_addr arcs)
@@ -234,7 +240,6 @@ int getIndex(sc_addr vertex)
 
 int getWeight(sc_addr v1, sc_addr v2)
 {
-
     sc_iterator5 *it = sc_iterator5_f_a_f_a_a_new(context,
                              v1,
                              sc_type_arc_common,
@@ -242,9 +247,10 @@ int getWeight(sc_addr v1, sc_addr v2)
                              sc_type_arc_common,
                              0);
 
-    int weight = 0;
+    int weight = -100;
 
-    if (SC_TRUE == sc_iterator5_next(it)) {
+    if(SC_TRUE == sc_iterator5_next(it))
+    {
         sc_addr node_weight = sc_iterator5_value(it, 4);
         weight = toInt(node_weight);
     }
