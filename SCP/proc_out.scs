@@ -97,9 +97,9 @@ scp_program -> proc_out (*
 		-> ..proc_out_get_next_vertex (*
 			<- searchElStr5;;
 			-> rrel_1: rrel_fixed: rrel_scp_var: _begin_vertex;;
-			-> rrel_2: rrel_assign: rrel_scp_var: rrel_common: _arc1;;
+			-> rrel_2: rrel_assign: rrel_scp_var: _arc1;;
 			-> rrel_3: rrel_assign: rrel_scp_var: _next_vertex;;
-			-> rrel_4: rrel_assign: rrel_scp_var: rrel_pos_const_perm: _arc2;;
+			-> rrel_4: rrel_assign: rrel_scp_var: _arc2;;
 			-> rrel_5: rrel_fixed: rrel_scp_var: _chain;;
 			=> nrel_then: ..proc_out_print_common_arc;;
 			=> nrel_else: ..proc_out_print_new_line;;
@@ -147,7 +147,7 @@ scp_program -> proc_out (*
 		//После этого переходим к оператору получения следующей цепи
 		-> ..proc_out_print_new_line (*
 			<- printNl;;
-			-> rrel_1: rrel_fixed: rrel_scp_const: [Next chain];; 		
+			-> rrel_1: rrel_fixed: rrel_scp_const: [ ];; 		
 			=> nrel_goto: ..proc_out_get_chain;;	
 		*);;
 
