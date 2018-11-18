@@ -204,12 +204,12 @@ scp_program -> proc_find_chains_by_length (*
 	-> ..proc_find_all_chains_by_length_erase_all_begin_vertices (*
 		<- eraseEl;;
 		-> rrel_1: rrel_fixed: rrel_scp_var: rrel_erase: _all_begin_vertices;;
-		=> nrel_goto: ..proc_find_all_chains_by_length_call_out;; //proc_find_all_chains_by_length_call_sift_chains
+		=> nrel_goto: ..proc_find_all_chains_by_length_call_sift_chains;; //proc_find_all_chains_by_length_call_sift_chains
 	*);;
 
 	//Оператор вызова proc_sift_chains
 	//Вызванная программа отсеивает лишние цепи (у которых длина != _length)
-	/*-> ..proc_find_all_chains_by_length_call_sift_chains (*
+	-> ..proc_find_all_chains_by_length_call_sift_chains (*
 		<- call;;
 		-> rrel_1: rrel_fixed: rrel_scp_const: proc_sift_chains;;
 		-> rrel_2: rrel_fixed: rrel_scp_const: ... (*
@@ -226,7 +226,7 @@ scp_program -> proc_find_chains_by_length (*
 		<- waitReturn;;
 		-> rrel_1: rrel_fixed: rrel_scp_var: _descr2;;
 		=> nrel_goto: ..proc_find_all_chains_by_length_call_out;;
-	*);;*/
+	*);;
 
 	//Оператор вызова proc_out
 	//Вызванная программа выводит результат

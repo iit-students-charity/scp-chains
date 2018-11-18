@@ -1,7 +1,7 @@
 scp_program -> proc_length (*	
 	-> rrel_params: ... (*
 		-> rrel_1: rrel_in: _chain;;
-		-> rrel_1: rrel_out: _length;;
+		-> rrel_2: rrel_out: _length;;
 	*);;
 
 	-> rrel_operators: ... (*
@@ -9,10 +9,10 @@ scp_program -> proc_length (*
 		//Инициализация переменной _length, которая хранит длину цепи
 		//Переход к оператору получения начальной вершины
 		-> rrel_init: ..proc_length_initialize (*
-			<- contAssign;;
+			<- varAssign;;
 			-> rrel_1: rrel_assign: rrel_scp_var: _length;;
 			-> rrel_2: rrel_fixed: rrel_scp_const: [0];;
-			=> nrel_goto: proc_length_get_first_vertex;;
+			=> nrel_goto: ..proc_length_get_first_vertex;;
 		*);;
 
 		//Оператор нахождения первой вершины в цепи
@@ -25,8 +25,8 @@ scp_program -> proc_length (*
 			-> rrel_3: rrel_assign: rrel_scp_var: _begin_vertex;;
 			-> rrel_4: rrel_assign: rrel_scp_var: _arc2;;
 			-> rrel_5: rrel_fixed: rrel_scp_const: rrel_next;;
-			=> nrel_then: ..proc_length_find;;
-			=> nrel_else: ..proc_length_return;;
+			=> nrel_then: ..proc_length_find_arc;;
+			=> nrel_else: ..proc_length_print;;
 		*);;
 
 		//Оператор нахождения дуги между двумя вершинами
@@ -47,14 +47,52 @@ scp_program -> proc_length (*
 		//Если вес найден, то переходим к сложению _length+=_weight
 		//Если вес не найден, то выходим из программы (вряд ли такое может быть)
 		-> ..proc_length_get_weight (*
+			<- searchSetStr5;;
+			-> rrel_1: rrel_fixed: rrel_scp_var: _begin_vertex;;
+			-> rrel_2: rrel_assign: rrel_scp_var: rrel_common: _neccesary_arc;;
+			-> rrel_3: rrel_fixed: rrel_scp_var: _next_vertex;;
+			-> rrel_4: rrel_assign: rrel_scp_var: rrel_common: _arc2;;
+			-> rrel_5: rrel_assign: rrel_scp_var: _weight;;
+			->rrel_set_5: rrel_assign: rrel_scp_var: _all_adjacent_vertices;;
+			=> nrel_then: ..proc_find_all_chains_get_adjacent_vertex;;
+			=> nrel_else: ..proc_length_print;;
+		*);;
+
+		//Получение смежной вершины
+		-> ..proc_find_all_chains_get_adjacent_vertex (*
+			<- searchElStr3;;
+			-> rrel_1: rrel_fixed: rrel_scp_var: _all_adjacent_vertices;;
+			-> rrel_2: rrel_assign: rrel_scp_var: rrel_pos_const_perm: _arc_adjacent_vertex;;
+			-> rrel_3: rrel_assign: rrel_scp_var: _weight;;
+			=> nrel_then: ..proc_find_all_chains_erase_adjacent_vertex;; 
+			=> nrel_else: ..proc_length_print;;
+		*);;
+
+		//Удаление пройденной вершины из множества смежных вершин путем удаления дуги, связывающей множество вершин и данную вершину
+		//Переход к оператору получения следующей смежной вершины
+		-> ..proc_find_all_chains_erase_adjacent_vertex (*
+			<- eraseEl;;
+			-> rrel_1: rrel_fixed: rrel_erase: rrel_scp_var: _arc_adjacent_vertex;;
+			=> nrel_goto: ..proc_length_temp;;
+		*);;
+
+
+		-> ..proc_length_temp (*
+			<- varAssign;;
+			-> rrel_1: rrel_assign: rrel_scp_var: _temp;;
+			-> rrel_2: rrel_fixed: rrel_scp_var: _length;;
+			=> nrel_goto: ..proc_out_print_vertex;;
+		*);;
+
+		-> ..proc_out_print_vertex (*
 			<- searchElStr5;;
-			-> rrel_1: rrel_assign: rrel_scp_const: _weight;;
-			-> rrel_2: rrel_assign: rrel_scp_var: _arc1;;
-			-> rrel_3: rrel_fixed: rrel_scp_var: _neccesary_arc;;
-			-> rrel_4: rrel_assign: rrel_scp_var: rrel_pos_const_perm: _arc2;;
-			-> rrel_5: rrel_fixed: rrel_scp_const: rrel_weight;;
-			=> nrel_then: ..proc_length_sum;;
-			=> nrel_else: ..proc_length_return;;
+			-> rrel_1: rrel_fixed: rrel_scp_var: _weight;;
+			-> rrel_2: rrel_assign: rrel_const: rrel_common: rrel_scp_var: _arc2;;
+			-> rrel_3: rrel_assign: rrel_scp_var: _print_value;;
+			-> rrel_4: rrel_assign: rrel_pos: rrel_scp_var: _arc4;;
+			-> rrel_5: rrel_fixed: rrel_scp_const: nrel_system_identifier;;
+			=> nrel_then: ..proc_length_sum;;		
+		 	=> nrel_else: ..proc_find_all_chains_get_adjacent_vertex;;
 		*);;
 
 		//Оператор сложения
@@ -62,9 +100,9 @@ scp_program -> proc_length (*
 		-> ..proc_length_sum (*
 			<- contAdd;;
 			-> rrel_1: rrel_assign: rrel_scp_var: _length;;
-			-> rrel_2: rrel_fixed: rrel_scp_var: _length;;
-			-> rrel_3: rrel_fixed: rrel_scp_const: _weight;;
-			=> nrel_goto: proc_length_change_value_of_begin_vertex;;
+			-> rrel_2: rrel_fixed: rrel_scp_var: _temp;;
+			-> rrel_3: rrel_fixed: rrel_scp_var: _print_value;;
+			=> nrel_goto: ..proc_length_change_value_of_begin_vertex;;
 		*);;
 
 		//_begin_vertex = _next_vertex

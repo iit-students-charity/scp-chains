@@ -24,7 +24,7 @@ scp_program -> proc_out (*
 		//Затем выход из программы
 		-> ..proc_out_print_not_exists (*
 			<- printNl;;
-			-> rrel_1: rrel_fixed: rrel_scp_const: [There are no chains];; 		
+			-> rrel_1: rrel_fixed: rrel_scp_const: [Цепей нет];; 		
 			=> nrel_goto: ..proc_out_return;;	
 		*);;
 
