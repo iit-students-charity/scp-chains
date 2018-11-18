@@ -1,6 +1,10 @@
+
+//Программа удаления цепей, длина которых != заданной длине
 scp_program -> proc_sift_chains (*	
 	-> rrel_params: ... (*
+		//Узел графа
 		-> rrel_1: rrel_in: _graph;;
+		//Заданная цепь (sc-ссылка)
 		-> rrel_2: rrel_in: _neccessary_length;;
 	*);;
 
@@ -18,12 +22,14 @@ scp_program -> proc_sift_chains (*
 			-> rrel_5: rrel_fixed:  rrel_scp_const: rrel_chain;;
 			->rrel_set_3: rrel_assign: rrel_scp_var: _all_chains;;
 			=> nrel_then: ..proc_sift_chains_get_chain;;		
-			=> nrel_else: ..proc_sift_chains_print;;	
+			=> nrel_else: ..proc_sift_chains_return;;	
 		*);;
 
+		//---------------Перебор всех цепей-------------
+
 		//Поиск цепи во множестве всех цепей
-		//Если цепь найдена, то удаляем дугу между этой цепью и множество всех цепей
-		//Если цепь не найдена, то удаляем множесто _all_chains
+		//Если цепь найдена, то удаляем дугу между этой цепью и множеством всех цепей
+		//Если цепь не найдена, то удаляем множесто _all_chains и выходим из программы
 		-> ..proc_sift_chains_get_chain (*
 			<- searchElStr3;;
 			-> rrel_1: rrel_fixed: rrel_scp_var: _all_chains;;
@@ -34,25 +40,26 @@ scp_program -> proc_sift_chains (*
 		*);;
 
 		//Удаление дуги между цепью и множеством всех цепей
-		//Переход к вызову функции proc_length, которая вычисляет длину цепи _chain
+		//Переход к вызову функции proc_length, которая вычисляет длину цепи _chain (перед этим создадим переменную _length, в которой будем хранить длину цепи _chain)
 		-> ..proc_sift_chains_delete_arc (*
 			<- eraseEl;;
 			-> rrel_1: rrel_fixed: rrel_erase: rrel_scp_var: _deleted_arc;;
 			=> nrel_goto: ..proc_sift_chains_generate_length;;	
 		*);;
 
+		//Оператор создания переменной, хранящей длину цепи
 		-> ..proc_sift_chains_generate_length (*
 			<- genEl;;
 			-> rrel_1: rrel_assign: rrel_node: rrel_scp_var: _length;;
 			=> nrel_goto: ..proc_sift_chains_get_length;;
 		*);;
 
-		//Вызов программы proc_length
+		//Вызов программы proc_length, которая вычисляет длину цепи
 		-> ..proc_sift_chains_get_length (*
 			<- call;;
 			-> rrel_1: rrel_fixed: rrel_scp_const: proc_length;;
 			-> rrel_2: rrel_fixed: rrel_scp_const: ... (*
-				//Обрабатываемая цепь
+				//Цепь, длину которой нужно найти
 				-> rrel_1: rrel_fixed: rrel_scp_var: _chain;;
 				//Длина цепи
 				-> rrel_2: rrel_assign: rrel_scp_var: _length;;
@@ -92,14 +99,6 @@ scp_program -> proc_sift_chains (*
 		-> ..proc_sift_chains_clear (*
 			<- eraseEl;;
 			-> rrel_1: rrel_fixed: rrel_erase: rrel_scp_var: _all_chains;;
-			=> nrel_goto: ..proc_sift_chains_print;;	
-		*);;
-
-		//Вывод сообщения
-		//После этого выходим из программы
-		-> ..proc_sift_chains_print (*
-			<- printNl;;
-			-> rrel_1: rrel_fixed: rrel_scp_const: [Проверка завершена];; 		
 			=> nrel_goto: ..proc_sift_chains_return;;	
 		*);;
 
